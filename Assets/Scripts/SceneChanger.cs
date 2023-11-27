@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class SceneChanger : MonoBehaviour
 {
+    GameObject Sliders;
     GameObject Mainscreen;
     GameObject Mainflie;
     GameObject Infiltration;
@@ -14,9 +15,12 @@ public class SceneChanger : MonoBehaviour
     {
         if (SceneManager.GetActiveScene().buildIndex == 1)
         {
+            Sliders = GameObject.Find("Sliders");
             Mainscreen = GameObject.Find("MainScreen");
             Mainflie = GameObject.Find("MainFileScreen");
             Infiltration = GameObject.Find("InfiltrationScreen");
+
+            Sliders.transform.GetChild(0).gameObject.SetActive(true);
             Mainscreen.transform.GetChild(0).gameObject.SetActive(true);
             Mainflie.transform.GetChild(0).gameObject.SetActive(false);
             Infiltration.transform.GetChild(0).gameObject.SetActive(false);
@@ -47,15 +51,15 @@ public class SceneChanger : MonoBehaviour
 
     public void InInfiltration()
     {
-        Mainscreen.transform.GetChild(0).GetChild(1).gameObject.SetActive(false);
-        Mainscreen.transform.GetChild(0).GetChild(2).gameObject.SetActive(false);
+        Sliders.transform.GetChild(0).gameObject.SetActive(false);
+        Mainscreen.transform.GetChild(0).gameObject.SetActive(false);
         Infiltration.transform.GetChild(0).gameObject.SetActive(true);
     }
 
     public void OutInfiltration()
     {
         Infiltration.transform.GetChild(0).gameObject.SetActive(false);
-        Mainscreen.transform.GetChild(0).GetChild(1).gameObject.SetActive(true);
-        Mainscreen.transform.GetChild(0).GetChild(2).gameObject.SetActive(true);
+        Mainscreen.transform.GetChild(0).gameObject.SetActive(true);
+        Sliders.transform.GetChild(0).gameObject.SetActive(true);
     }
 }
