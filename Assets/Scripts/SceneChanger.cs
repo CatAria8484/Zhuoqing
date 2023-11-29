@@ -1,65 +1,94 @@
-using System.Collections;
-using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class SceneChanger : MonoBehaviour
 {
+    public static SceneChanger instance;
+
     GameObject Sliders;
     GameObject Mainscreen;
-    GameObject Mainflie;
-    GameObject Infiltration;
+    GameObject MainflieScreen;
+    GameObject InfiltrationScreen;
+    GameObject ExplorationScreen;
+
+    int WhatFile = 1;
 
     void Start()
     {
-        if (SceneManager.GetActiveScene().buildIndex == 1)
+        if (SceneManager.GetActiveScene().buildIndex == 1)      // access only MainScene
         {
-            Sliders = GameObject.Find("Sliders");
-            Mainscreen = GameObject.Find("MainScreen");
-            Mainflie = GameObject.Find("MainFileScreen");
-            Infiltration = GameObject.Find("InfiltrationScreen");
-
-            Sliders.transform.GetChild(0).gameObject.SetActive(true);
-            Mainscreen.transform.GetChild(0).gameObject.SetActive(true);
-            Mainflie.transform.GetChild(0).gameObject.SetActive(false);
-            Infiltration.transform.GetChild(0).gameObject.SetActive(false);
+            Sliders = GameObject.Find("Sliders").transform.GetChild(0).gameObject;
+            Mainscreen = GameObject.Find("MainScreen").transform.GetChild(0).gameObject;
+            MainflieScreen = GameObject.Find("MainFileScreen").transform.GetChild(0).gameObject;
+            InfiltrationScreen = GameObject.Find("InfiltrationScreen").transform.GetChild(0).gameObject;
         }
+
+        if (instance == null) instance = this;
     }
 
-    public void InTitle()
+    void Update()
+    {
+        if (SceneManager.GetActiveScene().buildIndex == 1)      // access only MainScene
+            if (StoryManager.instance.isClear > 0)
+                Mainscreen.transform.GetChild(1).transform.GetChild(3).gameObject.SetActive(true);
+    }
+
+    public void InTitleScene()
     {
         SceneManager.LoadScene("Title");
     }
 
-    public void InMain()
+    public void InMainScene()
     {
         SceneManager.LoadScene("Main");
     }
 
-    public void InStoryLine()
+    public void InMainScreen()
     {
-        Mainscreen.transform.GetChild(0).gameObject.SetActive(false);
-        Mainflie.transform.GetChild(0).gameObject.SetActive(true);
+        Sliders.SetActive(true);
+        Mainscreen.SetActive(true);
+        MainflieScreen.SetActive(false);
+        InfiltrationScreen.SetActive(false);
     }
 
-    public void OutStoryLine()
+    public void InStoryLineScreen()
     {
-        Mainflie.transform.GetChild(0).gameObject.SetActive(false);
-        Mainscreen.transform.GetChild(0).gameObject.SetActive(true);
+        Sliders.SetActive(false);
+        Mainscreen.SetActive(false);
+        MainflieScreen.SetActive(true);
+        InfiltrationScreen.SetActive(false);
     }
 
-    public void InInfiltration()
+    public void InInfiltrationScreen()
     {
-        Sliders.transform.GetChild(0).gameObject.SetActive(false);
-        Mainscreen.transform.GetChild(0).gameObject.SetActive(false);
-        Infiltration.transform.GetChild(0).gameObject.SetActive(true);
+        Mainscreen.SetActive(false);
+        MainflieScreen.SetActive(false);
+        InfiltrationScreen.SetActive(true);
+        StoryManager.instance.StartStory(WhatFile);
     }
 
-    public void OutInfiltration()
+    public void InExplorationScreen()
     {
-        Infiltration.transform.GetChild(0).gameObject.SetActive(false);
-        Mainscreen.transform.GetChild(0).gameObject.SetActive(true);
-        Sliders.transform.GetChild(0).gameObject.SetActive(true);
+
+    }
+
+    public void SelectMainfile_1()
+    {
+        WhatFile = 1;
+        InInfiltrationScreen();
+    }
+
+    public void SelectMainfile_2()
+    {
+        WhatFile = 2;
+        InInfiltrationScreen();
+    }
+
+    public void SelectMainfile_3()
+    {
+        WhatFile = 3;
+        InInfiltrationScreen();
     }
 }
