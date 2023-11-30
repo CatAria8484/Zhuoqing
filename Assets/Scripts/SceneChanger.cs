@@ -91,4 +91,14 @@ public class SceneChanger : MonoBehaviour
         WhatFile = 3;
         InInfiltrationScreen();
     }
+
+    public void DeleteUserData()
+    {
+        UserData _userData = new UserData();
+
+        FileStream file = new FileStream(Application.persistentDataPath + "/userdata.dat", FileMode.Create);
+        BinaryFormatter binaryFormatter = new BinaryFormatter();
+        binaryFormatter.Serialize(file, _userData);
+        file.Close();
+    }
 }

@@ -18,7 +18,7 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
-        Bag = GameObject.Find("InfiltrationScreen").transform.GetChild(0).transform.GetChild(1).transform.GetChild(1).gameObject;
+        Bag = GameObject.Find("InfiltrationScreen").transform.GetChild(0).transform.GetChild(2).transform.GetChild(1).gameObject;
 
         f_Doubt = GameObject.Find("Sliders").transform.GetChild(0).transform.GetChild(0).transform.GetChild(0).GetComponent<Slider>();
         w_Doubt = GameObject.Find("Sliders").transform.GetChild(0).transform.GetChild(0).transform.GetChild(1).GetComponent<Slider>();
@@ -121,21 +121,6 @@ public class GameController : MonoBehaviour
         {
             Debug.Log(exception.Message);
             userData = new UserData();
-        }
-    }
-
-    public void DeleteUserData()
-    {
-        FileInfo file;
-
-        try
-        {
-            file = new FileInfo(Application.persistentDataPath + "/userdata.dat");
-            file.Delete();
-        }
-        catch (FileNotFoundException exception)
-        {
-            Debug.Log(exception.Message);
         }
     }
 }
