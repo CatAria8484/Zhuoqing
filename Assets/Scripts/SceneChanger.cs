@@ -1,5 +1,3 @@
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,8 +11,6 @@ public class SceneChanger : MonoBehaviour
     GameObject InfiltrationScreen;
     GameObject ExplorationScreen;
 
-    int WhatFile = 1;
-
     void Start()
     {
         if (SceneManager.GetActiveScene().buildIndex == 1)      // access only MainScene
@@ -23,16 +19,11 @@ public class SceneChanger : MonoBehaviour
             Mainscreen = GameObject.Find("MainScreen").transform.GetChild(0).gameObject;
             MainflieScreen = GameObject.Find("MainFileScreen").transform.GetChild(0).gameObject;
             InfiltrationScreen = GameObject.Find("InfiltrationScreen").transform.GetChild(0).gameObject;
+            DataManager.instance.LoadUserData();
+
+            if (instance == null)
+                instance = this;
         }
-
-        if (instance == null) instance = this;
-    }
-
-    void Update()
-    {
-        if (SceneManager.GetActiveScene().buildIndex == 1)      // access only MainScene
-            if (StoryManager.instance.isClear > 0)
-                Mainscreen.transform.GetChild(1).transform.GetChild(3).gameObject.SetActive(true);
     }
 
     public void InTitleScene()
@@ -51,6 +42,10 @@ public class SceneChanger : MonoBehaviour
         Mainscreen.SetActive(true);
         MainflieScreen.SetActive(false);
         InfiltrationScreen.SetActive(false);
+
+        DataManager.instance.LoadUserData();
+        if (DataManager.instance.userData.isClear > 0)
+            Mainscreen.transform.GetChild(1).transform.GetChild(3).gameObject.SetActive(true);
     }
 
     public void InStoryLineScreen()
@@ -66,7 +61,10 @@ public class SceneChanger : MonoBehaviour
         Mainscreen.SetActive(false);
         MainflieScreen.SetActive(false);
         InfiltrationScreen.SetActive(true);
-        StoryManager.instance.StartStory(WhatFile);
+        Sliders.SetActive(true);
+        DataManager.instance.LoadUserData();
+        StoryManager.instance.StartStory(DataManager.instance.userData.currentFile);
+        //InMainScreen();
     }
 
     public void InExplorationScreen()
@@ -76,29 +74,25 @@ public class SceneChanger : MonoBehaviour
 
     public void SelectMainfile_1()
     {
-        WhatFile = 1;
+        DataManager.instance.LoadUserData();
+        DataManager.instance.userData.currentFile = 1;
+        DataManager.instance.SaveUserData();
         InInfiltrationScreen();
     }
 
     public void SelectMainfile_2()
     {
-        WhatFile = 2;
+        DataManager.instance.LoadUserData();
+        DataManager.instance.userData.currentFile = 2;
+        DataManager.instance.SaveUserData();
         InInfiltrationScreen();
     }
 
     public void SelectMainfile_3()
     {
-        WhatFile = 3;
+        DataManager.instance.LoadUserData();
+        DataManager.instance.userData.currentFile = 3;
+        DataManager.instance.SaveUserData();
         InInfiltrationScreen();
-    }
-
-    public void DeleteUserData()
-    {
-        UserData _userData = new UserData();
-
-        FileStream file = new FileStream(Application.persistentDataPath + "/userdata.dat", FileMode.Create);
-        BinaryFormatter binaryFormatter = new BinaryFormatter();
-        binaryFormatter.Serialize(file, _userData);
-        file.Close();
     }
 }
