@@ -19,7 +19,7 @@ public class SceneChanger : MonoBehaviour
             Mainscreen = GameObject.Find("MainScreen").transform.GetChild(0).gameObject;
             MainflieScreen = GameObject.Find("MainFileScreen").transform.GetChild(0).gameObject;
             InfiltrationScreen = GameObject.Find("InfiltrationScreen").transform.GetChild(0).gameObject;
-            DataManager.instance.LoadUserData();
+            UserDataManager.instance.LoadUserData();
 
             if (instance == null)
                 instance = this;
@@ -43,8 +43,8 @@ public class SceneChanger : MonoBehaviour
         MainflieScreen.SetActive(false);
         InfiltrationScreen.SetActive(false);
 
-        DataManager.instance.LoadUserData();
-        if (DataManager.instance.userData.isClear > 0)
+        UserDataManager.instance.LoadUserData();
+        if (UserDataManager.instance.userData.isClear > 0)
             Mainscreen.transform.GetChild(1).transform.GetChild(3).gameObject.SetActive(true);
     }
 
@@ -62,8 +62,8 @@ public class SceneChanger : MonoBehaviour
         MainflieScreen.SetActive(false);
         InfiltrationScreen.SetActive(true);
         Sliders.SetActive(true);
-        DataManager.instance.LoadUserData();
-        StoryManager.instance.StartStory(DataManager.instance.userData.currentFile);
+        UserDataManager.instance.LoadUserData();
+        StoryManager.instance.StartStory(UserDataManager.instance.userData.currentFile);
         //InMainScreen();
     }
 
@@ -74,25 +74,25 @@ public class SceneChanger : MonoBehaviour
 
     public void SelectMainfile_1()
     {
-        DataManager.instance.LoadUserData();
-        DataManager.instance.userData.currentFile = 1;
-        DataManager.instance.SaveUserData();
+        UserDataManager.instance.LoadUserData();
+        UserDataManager.instance.userData.currentFile = 1;
+        UserDataManager.instance.SaveUserData();
         InInfiltrationScreen();
     }
 
     public void SelectMainfile_2()
     {
-        DataManager.instance.LoadUserData();
-        DataManager.instance.userData.currentFile = 2;
-        DataManager.instance.SaveUserData();
+        UserDataManager.instance.LoadUserData();
+        UserDataManager.instance.userData.currentFile = 2;
+        UserDataManager.instance.SaveUserData();
         InInfiltrationScreen();
     }
 
     public void SelectMainfile_3()
     {
-        DataManager.instance.LoadUserData();
-        DataManager.instance.userData.currentFile = 3;
-        DataManager.instance.SaveUserData();
+        UserDataManager.instance.LoadUserData();
+        UserDataManager.instance.userData.currentFile = 3;
+        UserDataManager.instance.SaveUserData();
         InInfiltrationScreen();
     }
 }
