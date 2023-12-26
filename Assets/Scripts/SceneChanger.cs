@@ -3,13 +3,20 @@ using UnityEngine.SceneManagement;
 
 public class SceneChanger : MonoBehaviour
 {
-    public static SceneChanger instance;
+    public static SceneChanger Instance = null;
 
     GameObject Sliders;
     GameObject Mainscreen;
     GameObject MainflieScreen;
     GameObject InfiltrationScreen;
     GameObject ExplorationScreen;
+    GameObject GameOverScreen;
+
+    void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+    }
 
     void Start()
     {
@@ -19,10 +26,8 @@ public class SceneChanger : MonoBehaviour
             Mainscreen = GameObject.Find("MainScreen").transform.GetChild(0).gameObject;
             MainflieScreen = GameObject.Find("MainFileScreen").transform.GetChild(0).gameObject;
             InfiltrationScreen = GameObject.Find("InfiltrationScreen").transform.GetChild(0).gameObject;
-            UserDataManager.instance.LoadUserData();
 
-            if (instance == null)
-                instance = this;
+            GameOverScreen = GameObject.Find("GameOverScreen").transform.GetChild(0).gameObject;
         }
     }
 
@@ -43,8 +48,8 @@ public class SceneChanger : MonoBehaviour
         MainflieScreen.SetActive(false);
         InfiltrationScreen.SetActive(false);
 
-        UserDataManager.instance.LoadUserData();
-        if (UserDataManager.instance.userData.isClear > 0)
+        UserDataManager.Instance.LoadUserData();
+        if (UserDataManager.Instance.userData.isClear > 0)
             Mainscreen.transform.GetChild(1).transform.GetChild(3).gameObject.SetActive(true);
     }
 
@@ -62,9 +67,8 @@ public class SceneChanger : MonoBehaviour
         MainflieScreen.SetActive(false);
         InfiltrationScreen.SetActive(true);
         Sliders.SetActive(true);
-        UserDataManager.instance.LoadUserData();
-        StoryManager.instance.StartStory(UserDataManager.instance.userData.currentFile);
-        //InMainScreen();
+
+        StoryManager.Instance.StartStory();
     }
 
     public void InExplorationScreen()
@@ -72,27 +76,38 @@ public class SceneChanger : MonoBehaviour
 
     }
 
+    public void InGameOverScreen()
+    {
+        Sliders.SetActive(false);
+        InfiltrationScreen.SetActive(false);
+        GameOverScreen.SetActive(true);
+        Invoke("InTitleScene", 3);
+    }
+
     public void SelectMainfile_1()
     {
-        UserDataManager.instance.LoadUserData();
-        UserDataManager.instance.userData.currentFile = 1;
-        UserDataManager.instance.SaveUserData();
+        UserDataManager.Instance.LoadUserData();
+        UserDataManager.Instance.userData.currentFile = 1;
+        UserDataManager.Instance.SaveUserData();
+
         InInfiltrationScreen();
     }
 
     public void SelectMainfile_2()
     {
-        UserDataManager.instance.LoadUserData();
-        UserDataManager.instance.userData.currentFile = 2;
-        UserDataManager.instance.SaveUserData();
+        UserDataManager.Instance.LoadUserData();
+        UserDataManager.Instance.userData.currentFile = 2;
+        UserDataManager.Instance.SaveUserData();
+
         InInfiltrationScreen();
     }
 
     public void SelectMainfile_3()
     {
-        UserDataManager.instance.LoadUserData();
-        UserDataManager.instance.userData.currentFile = 3;
-        UserDataManager.instance.SaveUserData();
+        UserDataManager.Instance.LoadUserData();
+        UserDataManager.Instance.userData.currentFile = 3;
+        UserDataManager.Instance.SaveUserData();
+
         InInfiltrationScreen();
     }
 }

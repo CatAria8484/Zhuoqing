@@ -1,137 +1,172 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
 public class StoryManager : MonoBehaviour
 {
-    public static StoryManager instance = null;
+    public static StoryManager Instance = null;
 
     [SerializeField] DialogueEvent Script;
     [SerializeField] SelectEvent Event;
 
     [SerializeField] TextMeshProUGUI ScriptText;
+    [SerializeField] GameObject[] Choice;
+    [SerializeField] Sprite[] Sprites;
+    Image image;
 
-    [SerializeField] GameObject Choice;
-
-    [SerializeField] int eventNum;
-    int waitingTime;     // next line waitng
+    bool isTalking = false;
+    bool isNext = false;
 
     void Awake()
     {
-        if (instance == null)
-            instance = this;
+        if (Instance == null)
+            Instance = this;
     }
 
     void Start()
     {
         ScriptText = GameObject.Find("InfiltrationScreen").transform.GetChild(0).transform.GetChild(0).transform.GetChild(2).GetComponent<TextMeshProUGUI>();
-        Choice = GameObject.Find("InfiltrationScreen").transform.GetChild(0).transform.GetChild(1).transform.GetChild(2).gameObject;
-
-        // load data
-        UserDataManager.instance.LoadUserData();
+        image = GameObject.Find("InfiltrationScreen").transform.GetChild(0).GetComponent<Image>();
     }
 
-    public void StartStory(int WhatFile)
+    void Update()
     {
-        if (WhatFile == 1)
+        if (isTalking && isNext)
         {
-            StartCoroutine(MainFile1());
-        }
-        else if (WhatFile == 2)
-        {
-            ScriptText.text = "MainFile2 hasn't been developed yet.";
-        }
-        else if (WhatFile == 3)
-        {
-            ScriptText.text = "MainFile3 hasn't been developed yet.";
-        }
-    }
-
-    IEnumerator MainFile1()
-    {
-        Script.name = "MainFile1";
-        Script.dialogues = GameObject.Find("DialogueManager").GetComponent<InteractionEvent>().GetDialogues();
-        Event.name = "Event";
-        Event.selecter = GameObject.Find("DialogueManager").GetComponent<InteractionEvent>().GetSelectes();
-
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-
-        UserDataManager.instance.LoadUserData();
-        UserDataManager.instance.userData.f_val = 0.5f;
-        UserDataManager.instance.userData.w_val = 0.5f;
-        UserDataManager.instance.userData.currentLine = 0;
-        UserDataManager.instance.SaveUserData();
-
-        while (UserDataManager.instance.userData.currentLine < Script.dialogues.Length)
-        {
-            eventNum = int.Parse(Script.dialogues[UserDataManager.instance.userData.currentLine].eventid);
-            Debug.Log(eventNum);
-
-            if (eventNum > 0 && Event.selecter[eventNum - 1].note == "start")
+            if (Input.GetMouseButtonDown(0))                    // if clicked, writing next context
             {
-                int j = eventNum;
+                Debug.Log("clicked");
 
-                while(Event.selecter[j++].note != "end")
+                if (EventSystem.current.currentSelectedGameObject == null || EventSystem.current.currentSelectedGameObject.name != "Back" || EventSystem.current.currentSelectedGameObject.name != "OpenBag")            // if clicked Back button or Bag button, don't write next context
                 {
-                    Choice.transform.GetChild(j - eventNum).gameObject.SetActive(true);
-                    Choice.transform.GetChild(j - eventNum).GetChild(0).GetComponent<TextMeshProUGUI>().text = Event.selecter[j].contexts;
-                }
-
-                if (Physics.Raycast(ray, out hit))
-                {
-                    switch (hit.transform.gameObject.name)
+                    if (++UserDataManager.Instance.userData.currentLine < Script.dialogues.Length)
                     {
-                        case "Selection1":
-                            UserDataManager.instance.userData.currentLine = int.Parse(Event.selecter[eventNum + 0].eventid); break;
+                        isNext = false;
+                        flow_Story();
+                    }
+                    else                                           // if wrote all context, going main screen after clear dialogues and save user datas
+                    {
+                        Script = null;
+                        Event = null;
+                        isTalking = false;
+                        isNext = false;
 
-                        case "Selection2":
-                            UserDataManager.instance.userData.currentLine = int.Parse(Event.selecter[eventNum + 1].eventid); break;
+                        UserDataManager.Instance.LoadUserData();
+                        if(UserDataManager.Instance.userData.isClear == 0) UserDataManager.Instance.userData.isClear = 1;
+                        UserDataManager.Instance.userData.currentFile++;
+                        UserDataManager.Instance.userData.currentLine = 0;
+                        UserDataManager.Instance.userData.f_current_val = UserDataManager.Instance.userData.f_val;
+                        UserDataManager.Instance.userData.w_current_val = UserDataManager.Instance.userData.w_val;
+                        UserDataManager.Instance.SaveUserData();
 
-                        case "Selection3":
-                            UserDataManager.instance.userData.currentLine = int.Parse(Event.selecter[eventNum + 2].eventid); break;
-
-                        case "Selection4":
-                            UserDataManager.instance.userData.currentLine = int.Parse(Event.selecter[eventNum + 3].eventid); break;
+                        SceneChanger.Instance.InMainScreen();
                     }
                 }
             }
-            else if(eventNum > 0 && Script.dialogues[UserDataManager.instance.userData.currentLine].note == "minigame")
-            {
-
-            }
-
-            UserDataManager.instance.LoadUserData();
-            yield return StartCoroutine(click_initLine(Script.dialogues[UserDataManager.instance.userData.currentLine++].contexts));
-            UserDataManager.instance.SaveUserData();
         }
-
-
-        UserDataManager.instance.LoadUserData();
-        UserDataManager.instance.userData.isClear = 1;
-        UserDataManager.instance.userData.f_current_val = UserDataManager.instance.userData.f_val;
-        UserDataManager.instance.userData.w_current_val = UserDataManager.instance.userData.w_val;
-        UserDataManager.instance.SaveUserData();
-
-        yield return StartCoroutine(wait_initLine("wait seconds. coming mainscreen soon"));
-        SceneChanger.instance.InMainScreen();
     }
 
-    IEnumerator click_initLine(string line)             // next line with click
+    public void StartStory()
     {
-        ScriptText.text = line;
-        yield return null;
+        UserDataManager.Instance.LoadUserData();
 
-        while (true)
+        switch (UserDataManager.Instance.userData.currentFile)
         {
-            if (Input.GetMouseButtonUp(0))
-                break;
-            yield return null;
+            case 1: Debug.Log("startstory"); MainFile1(); break;
+            case 2: ScriptText.text = "MainFile2 hasn't been developed yet."; break;
+            case 3: ScriptText.text = "MainFile3 hasn't been developed yet."; break;
         }
     }
 
-    IEnumerator wait_initLine(string line)              // next line after few seconds
+    void MainFile1()
     {
-        yield return new WaitForSeconds(waitingTime);
+        image.sprite = Sprites[0];
+        Script.name = "MainFile1";
+        Script.dialogues = GameObject.Find("DialogueManager").GetComponent<InteractionEvent>().GetDialogues();
+        Event.name = "EventFile1";
+        Event.selecter = GameObject.Find("DialogueManager").GetComponent<InteractionEvent>().GetSelectes();
+
+        UserDataManager.Instance.LoadUserData();
+        UserDataManager.Instance.userData.f_val = 0.5f;
+        UserDataManager.Instance.userData.w_val = 0.5f;
+        UserDataManager.Instance.userData.currentLine = 0;
+        UserDataManager.Instance.SaveUserData();
+
+        isTalking = true;
+        flow_Story();
+    }
+
+    void flow_Story()
+    {
+        ScriptText.text = Script.dialogues[UserDataManager.Instance.userData.currentLine].contexts;
+
+        int num = int.Parse(Script.dialogues[UserDataManager.Instance.userData.currentLine].eventid);
+        Debug.Log(num);
+        if (num > 0)
+        {
+            SelectsActive(num - 1);
+            return;
+        }
+
+        if (Script.dialogues[UserDataManager.Instance.userData.currentLine].note == Script.dialogues[9].note)
+        {
+            isTalking = false;
+            SceneChanger.Instance.Invoke("InGameOverScreen", 1);
+        }
+
+        isNext = true;
+        Debug.Log("flowstory");
+    }
+
+    void SelectsActive(int num)
+    {
+        for (int i = num; ; i++)
+        {
+            Debug.Log(Event.selecter[i].note);
+
+            Choice[i - num].gameObject.SetActive(true);
+            Choice[i - num].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = Event.selecter[i].contexts;
+
+            if (Event.selecter[i].note == Event.selecter[2].note)
+                break;
+        }
+        Debug.Log("active");
+    }
+
+    void SelectsDeactive()
+    {
+        for(int i = 0; i < Choice.Length; i++)
+            Choice[i].gameObject.SetActive(false);
+        Debug.Log("deactive");
+    }
+
+    public void choice1()
+    {
+        UserDataManager.Instance.userData.currentLine = int.Parse(Event.selecter[int.Parse(Script.dialogues[UserDataManager.Instance.userData.currentLine].eventid) - 1].eventid) - 1;
+        SelectsDeactive();
+        flow_Story();
+    }
+
+    public void choice2()
+    {
+        UserDataManager.Instance.userData.currentLine = int.Parse(Event.selecter[int.Parse(Script.dialogues[UserDataManager.Instance.userData.currentLine].eventid)].eventid) - 1;
+        SelectsDeactive();
+        flow_Story();
+    }
+
+    public void choice3()
+    {
+        UserDataManager.Instance.userData.currentLine = int.Parse(Event.selecter[int.Parse(Script.dialogues[UserDataManager.Instance.userData.currentLine].eventid) + 1].eventid) - 1;
+        SelectsDeactive();
+        flow_Story();
+    }
+
+    public void choice4()
+    {
+        UserDataManager.Instance.userData.currentLine = int.Parse(Event.selecter[int.Parse(Script.dialogues[UserDataManager.Instance.userData.currentLine].eventid) + 2].eventid) - 1;
+        SelectsDeactive();
+        flow_Story();
     }
 }

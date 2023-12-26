@@ -5,14 +5,14 @@ using UnityEngine;
 
 internal class UserDataManager : MonoBehaviour
 {
-    public static UserDataManager instance = null;
+    public static UserDataManager Instance = null;
 
-    internal UserData userData;
+    [SerializeField] internal UserData userData;
 
     void Awake()
     {
-        if (instance == null)
-            instance = this;
+        if (Instance == null)
+            Instance = this;
     }
 
     internal void SaveUserData()

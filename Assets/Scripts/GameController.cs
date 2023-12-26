@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
-    public static GameController instance;
+    public static GameController Instance;
 
     GameObject Bag;
 
@@ -14,8 +14,8 @@ public class GameController : MonoBehaviour
 
     void Awake()
     {
-        if (instance == null)
-            instance = this;
+        if (Instance == null)
+            Instance = this;
     }
 
     void Start()
@@ -26,9 +26,9 @@ public class GameController : MonoBehaviour
         w_Doubt = GameObject.Find("Sliders").transform.GetChild(0).transform.GetChild(0).transform.GetChild(1).GetComponent<Slider>();
 
         // load data
-        UserDataManager.instance.LoadUserData();
-        f_Doubt.value = UserDataManager.instance.userData.f_current_val;
-        w_Doubt.value = UserDataManager.instance.userData.w_current_val;
+        UserDataManager.Instance.LoadUserData();
+        f_Doubt.value = UserDataManager.Instance.userData.f_current_val;
+        w_Doubt.value = UserDataManager.Instance.userData.w_current_val;
     }
 
     public void f_good()
@@ -62,10 +62,10 @@ public class GameController : MonoBehaviour
     // save data
     void savedata()
     {
-        UserDataManager.instance.LoadUserData();
-        UserDataManager.instance.userData.f_val = f_Doubt.value;
-        UserDataManager.instance.userData.w_val = w_Doubt.value;
-        UserDataManager.instance.SaveUserData();
+        UserDataManager.Instance.LoadUserData();
+        UserDataManager.Instance.userData.f_val = f_Doubt.value;
+        UserDataManager.Instance.userData.w_val = w_Doubt.value;
+        UserDataManager.Instance.SaveUserData();
     }
 
     public void OpenBag()
